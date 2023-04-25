@@ -1,0 +1,47 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.6'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.ozink'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+tasks.register('webpack', Exec) {
+	workingDir "$projectDir/src/main/ui"
+	commandLine 'node', "$projectDir/node_modules/webpack/bin/webpack.js", '--config', "./config/webpack.dev.js"
+}
+
+tasks.register('webpackDevServer', Exec) {
+	workingDir "$projectDir/src/main/ui"
+	commandLine 'node', "$projectDir/node_modules/webpack-dev-server/bin/webpack-dev-server.js", '--config', "./config/webpack.dev.js"
+}
+
+processResources {
+	dependsOn webpack
+}
+
+bootRun {
+	sourceResources sourceSets.main
+	systemProperty 'spring.profiles.active', 'dev'
+}
