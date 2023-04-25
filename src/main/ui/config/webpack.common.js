@@ -6,7 +6,7 @@ const paths = require('./paths')
 
 module.exports = {
     // Where webpack looks to start building the bundle
-    entry: [paths.src + '/index.js'],
+    entry: [paths.src + '/index.tsx'],
 
     // Where webpack outputs the assets and bundles
     output: {
@@ -49,12 +49,13 @@ module.exports = {
         rules: [
             // JavaScript: Use Babel to transpile JavaScript files
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(js|ts)x?$/,
                 exclude: /(node_modules)/,
                 use: {
                     loader: 'babel-loader',
                     options: {
                         presets: [
+                            "@babel/preset-typescript",
                             '@babel/preset-env',
                             ['@babel/preset-react', {"runtime": "automatic"}]
                         ]
@@ -72,7 +73,7 @@ module.exports = {
 
     resolve: {
         modules: [paths.projectDir, 'node_modules'],
-        extensions: ['.js', '.jsx', '.json'],
+        extensions: ['.js', '.jsx', '.tsx', '.json'],
         alias: {
             '@': paths.src,
             assets: paths.public,
