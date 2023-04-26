@@ -97,13 +97,14 @@ html * {
   background: #585858;
   margin: 10px;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 10px 10px 0 10px;
   max-width: 300px;
   color: white;
 
   &-my {
     @extend .message;
     background: dodgerblue;
+    border-radius: 0 10px 10px 10px;
     color: white;
   }
 
@@ -111,6 +112,7 @@ html * {
     margin: 3px;
     max-width: 296px;
     word-break: break-word;
+    white-space: pre-line;
   }
 
   &-name {

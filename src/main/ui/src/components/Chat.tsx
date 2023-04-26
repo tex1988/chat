@@ -1,74 +1,106 @@
-import { ChangeEvent, KeyboardEvent, FC, useEffect, useState } from 'react';
-import Message, { IMessage } from './Message';
+import { ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import Message, { ChatMessage } from './Message';
+import { useStompClient, useSubscription } from 'react-stomp-hooks';
 
 const Chat: FC = () => {
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const [name, setName] = useState<string>('');
-  let nameInput: string = '';
-  let message: string = '';
+  // const defaultMessages: ChatMessage[] = [{ name: 'Tex', message: 'This is a long message...', time: '18:00' },
+  //   { name: 'Oleksii',
+  //       message: 'Another long message............................................................',
+  //       time: '18:00',
+  //     }
+  // ];
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const name = useRef<string>('');
+  const [displayName, setDisplayName] = useState<string>(name.current);
+  const [nameInput, setNameInput] = useState<string>('');
+  const [messageInput, setMessageInput] = useState<string>('')
+  const stompClient = useStompClient();
+  useSubscription('/topic/general',
+    (message) => handleMessage(JSON.parse(message.body) as ChatMessage));
 
   useEffect(() => {
-  }, [name]);
+  }, [messages, displayName]);
+
+  useEffect(() => {
+    name.current = getName();
+  }, []);
+
+  function getName(): string {
+    const name: string | null = window.localStorage.getItem('name');
+    return !!name ? name : '';
+  }
+
+  function putNameToLS(name: string): void {
+    if (name.length > 0) {
+      window.localStorage.setItem('name', name);
+    }
+  }
+
+  function handleMessage(message: ChatMessage) {
+    setMessages(messages => [...messages, message]);
+  }
 
   function onNameInput(event: ChangeEvent<HTMLInputElement>): void {
-    nameInput = event.target.value;
+    setNameInput(event.target.value);
+  }
+
+  function onSetNameButtonClick(): void {
+    name.current = nameInput;
+    setDisplayName(nameInput);
+    putNameToLS(nameInput)
   }
 
   function onMessageInput(event: ChangeEvent<HTMLTextAreaElement>): void {
-    message = event.target.value;
+    setMessageInput(event.target.value);
   }
 
   function onMessageSend(): void {
-    validateName();
+    if (validateName()) {
+      stompClient?.publish({
+        destination: `/app/general`,
+        body: JSON.stringify({ name: name.current, message: messageInput }),
+      });
+      setMessageInput('');
+    }
   }
 
   function onTextAreaKeyPress(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && event.altKey) {
       onMessageSend();
     }
   }
 
   function onNameInputKeyPress(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
-      setName(nameInput);
+      onSetNameButtonClick();
     }
   }
 
-  function validateName(): void {
-    if (name.length < 3) {
+  function validateName(): boolean {
+    if (name.current.length < 3) {
       alert('Please enter name not less than 3 characters');
+      return false;
     }
+    return true;
   }
 
   return (
     <>
       <div className='flex-row-center'>
-        <input className='input' type='text' name='Name' placeholder='Enter your name' onChange={onNameInput}
+        <input className='input' value={nameInput} placeholder='Enter your name' onChange={onNameInput}
                onKeyDown={onNameInputKeyPress} />
-        <button onClick={() => setName(nameInput)} className='button'>Set name</button>
+        <button onClick={onSetNameButtonClick} className='button'>Set name</button>
       </div>
       <div className='flex-row-center'>
-        <p>Your name: {name}</p>
+        <p>Your name: {name.current}</p>
       </div>
       <div className='message-area'>
-        <Message {...{
-          message: { name: 'Tex', message: 'This is a long message...', time: '18:00' },
-          myName: name,
-        }} />
-        <Message {...{
-          message: {
-            name: 'Oleksii',
-            message: 'Another long message............................................................',
-            time: '18:00',
-          },
-          myName: name,
-        }} />
         {
-          messages.map((message, index) => <Message {...{ message: message, myName: name }} key={index} />)
+          messages.map((message, index) => <Message {...{ message: message, myName: name.current }} key={index} />)
         }
       </div>
       <div className='text-area-container'>
-        <textarea className='text-area' onChange={onMessageInput} onKeyDown={onTextAreaKeyPress}></textarea>
+        <textarea className='text-area' value={messageInput} onChange={onMessageInput} onKeyDown={onTextAreaKeyPress}></textarea>
       </div>
       <div className='flex-row-center'>
         <button className='button' onClick={onMessageSend}>Send message</button>
