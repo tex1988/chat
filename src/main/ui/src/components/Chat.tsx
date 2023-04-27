@@ -13,7 +13,7 @@ const Chat: FC = () => {
   const name = useRef<string>('');
   const [displayName, setDisplayName] = useState<string>(name.current);
   const [nameInput, setNameInput] = useState<string>('');
-  const [messageInput, setMessageInput] = useState<string>('')
+  const [messageInput, setMessageInput] = useState<string>('');
   const stompClient = useStompClient();
   useSubscription('/topic/general',
     (message) => handleMessage(JSON.parse(message.body) as ChatMessage));
@@ -47,7 +47,7 @@ const Chat: FC = () => {
   function onSetNameButtonClick(): void {
     name.current = nameInput;
     setDisplayName(nameInput);
-    putNameToLS(nameInput)
+    putNameToLS(nameInput);
   }
 
   function onMessageInput(event: ChangeEvent<HTMLTextAreaElement>): void {
@@ -100,7 +100,8 @@ const Chat: FC = () => {
         }
       </div>
       <div className='text-area-container'>
-        <textarea className='text-area' value={messageInput} onChange={onMessageInput} onKeyDown={onTextAreaKeyPress}></textarea>
+        <textarea className='text-area' value={messageInput} onChange={onMessageInput}
+                  onKeyDown={onTextAreaKeyPress}></textarea>
       </div>
       <div className='flex-row-center'>
         <button className='button' onClick={onMessageSend}>Send message</button>
