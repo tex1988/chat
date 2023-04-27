@@ -7,7 +7,7 @@ function App() {
 
   return (
     <StompSessionProvider
-      url={`ws://${window.location.host}/chat`}>
+      url={`wss://${window.location.host}/chat`}>
       <div className='root'>
         <div className='container'>
           <Chat />
