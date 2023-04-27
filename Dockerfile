@@ -10,6 +10,7 @@ WORKDIR /app
 RUN npm install
 
 # Build the Gradle project
+RUN chmod +x gradlew
 RUN ./gradlew build --no-daemon
 
 #
