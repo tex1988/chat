@@ -1,4 +1,4 @@
-FROM gradle:7.6.1-jdk17-alpine AS build
+FROM bellsoft/liberica-openjdk-alpine:17.0.7-7 AS build
 # Install Node.js 19
 RUN apk add --update nodejs npm
 
@@ -16,7 +16,7 @@ RUN ./gradlew build --no-daemon
 #
 # Package stage
 #
-FROM eclipse-temurin:17-alpine
+FROM bellsoft/liberica-openjdk-alpine:17.0.7-7
 COPY --from=build /app/build/libs/chat-0.0.1-SNAPSHOT.jar chat.jar
 # ENV PORT=443
 EXPOSE 443
