@@ -11,7 +11,7 @@ RUN npm install
 
 # Build the Gradle project
 RUN chmod +x gradlew
-RUN ./gradlew build --no-daemon
+RUN ./gradlew build --no-daemon -DEnv=prod
 
 #
 # Package stage
