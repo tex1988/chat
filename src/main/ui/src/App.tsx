@@ -4,12 +4,14 @@ import React from 'react';
 import { StompSessionProvider } from 'react-stomp-hooks';
 
 function App() {
+  function getWsProtocol(): string {
+    return location.protocol === 'https:' ? 'wss:' : 'ws:';
+  }
 
   return (
-    <StompSessionProvider
-      url={`wss://${window.location.host}/chat`}>
-      <div className='root'>
-        <div className='container'>
+    <StompSessionProvider url={`${getWsProtocol()}//${window.location.host}/chat`}>
+      <div className="root">
+        <div className="container">
           <Chat />
         </div>
       </div>

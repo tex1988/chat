@@ -18,6 +18,6 @@ RUN ./gradlew build --no-daemon
 #
 FROM bellsoft/liberica-openjdk-alpine:17.0.7-7
 COPY --from=build /app/build/libs/chat-0.0.1-SNAPSHOT.jar chat.jar
-# ENV PORT=8080
+# ENV PORT=443
 EXPOSE 443
-ENTRYPOINT ["java","-jar","chat.jar"]
+ENTRYPOINT ["java","-jar", "chat.jar", "--spring.profiles.active=prod"]
