@@ -10,10 +10,8 @@ function App() {
 
   return (
     <StompSessionProvider url={`${getWsProtocol()}//${window.location.host}/chat`}>
-      <div className="root">
-        <div className="container">
-          <Chat />
-        </div>
+      <div className="container">
+        <Chat />
       </div>
     </StompSessionProvider>
   );

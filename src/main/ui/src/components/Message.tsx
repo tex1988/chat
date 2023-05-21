@@ -1,28 +1,24 @@
-import { FC } from 'react';
+import { FC, useContext } from 'react';
+import { UserContext } from './Chat';
 
 export interface ChatMessage {
-  name: string,
-  message: string,
-  time: string
+  name: string;
+  content: string;
+  time: string;
 }
 
-type MessageProps = {
-  message: ChatMessage,
-  myName: String
-}
-
-const Message: FC<MessageProps> = (props) => {
-  const myName = props.myName;
-  const { name, message, time } = props.message;
-  const displayName = name === myName ? 'You' : name;
-
+const Message: FC<ChatMessage> = (props) => {
+  const { userName } = useContext(UserContext);
+  const { name, content, time } = props;
+  const isMyMessage = name === userName;
+  const displayName = isMyMessage ? 'You' : name;
 
   return (
-    <div className={name === myName ? 'message-row-my' : 'message-row'}>
-      <div className={name === myName ? 'message-my' : 'message'}>
-        <p className='message-name'>{displayName}</p>
-        <p>{message}</p>
-        <p className='message-time'>{time}</p>
+    <div className={isMyMessage ? 'message-row-my' : 'message-row'}>
+      <div className={isMyMessage ? 'message-my' : 'message'}>
+        <p className="message-name">{displayName}</p>
+        <p>{content}</p>
+        <p className="message-time">{time}</p>
       </div>
     </div>
   );
