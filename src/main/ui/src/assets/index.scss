@@ -87,12 +87,21 @@ html body {
   margin-top: 5px;
 
   button {
-    border: 1px solid grey;
+    padding: 10px;
+    border: 1px solid transparent;
     border-radius: 3px;
     margin: 10px 0 0 0;
+    background-color: #1e90ff;
+    color: white;
+    transition: all linear 200ms;
 
     &:disabled {
-      background-color: lightgray;
+      background-color: #3490e9;
+      color: lightgray;
+    }
+
+    &:hover {
+      background-color: #00a7ff;
     }
 
     @media screen and (max-width: 500px) {
