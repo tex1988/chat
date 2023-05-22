@@ -1,14 +1,7 @@
-import React, {
-  ChangeEvent,
-  FC,
-  KeyboardEvent,
-  StyleHTMLAttributes,
-  useContext,
-  useState,
-} from 'react';
+import React, { ChangeEvent, FC, KeyboardEvent, useContext, useState } from 'react';
 import { UserContext } from './Chat';
 
-const Name: FC = () => {
+const UserName: FC = () => {
   const { userName, onNameSave } = useContext(UserContext);
   const [nameInput, setNameInput] = useState<string>('');
   const [isEditMode, setEditMode] = useState<boolean>(!userName);
@@ -51,7 +44,7 @@ const Name: FC = () => {
       )}
       {userName && !isEditMode && (
         <div className="flex-row-center" style={styles.nameRow}>
-          <span>Welcome to chat:</span>
+          <span><pre>Welcome to chat: </pre></span>
           <span onClick={onNameClick} style={styles.name}>
             {userName}
           </span>
@@ -74,4 +67,4 @@ const styles = {
   },
 };
 
-export default Name;
+export default UserName;

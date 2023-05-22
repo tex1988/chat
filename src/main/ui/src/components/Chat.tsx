@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import Message, { ChatMessage } from './Message';
 import { useStompClient, useSubscription } from 'react-stomp-hooks';
-import Name from './Name';
+import UserName from './UserName';
 
 export const UserContext = createContext<UserContextType>({
   userName: null,
@@ -94,7 +94,7 @@ const Chat: FC = () => {
   return (
     <>
       <UserContext.Provider value={userContextValue}>
-        <Name />
+        <UserName />
         <div className="message-area">
           {messages.map((message, index) => (
             <Message {...message} key={index} />
