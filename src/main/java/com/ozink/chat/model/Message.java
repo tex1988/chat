@@ -7,5 +7,5 @@ public class Message {
 
     private String name;
     private String content;
-    private String time;
+    private String dateTime;
 }

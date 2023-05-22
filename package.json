@@ -12,6 +12,7 @@
     "@types/react-dom": "^18.0.11",
     "copy-webpack-plugin": "^11.0.0",
     "css-minimizer-webpack-plugin": "^5.0.0",
+    "get-user-locale": "^2.2.1",
     "mini-css-extract-plugin": "^2.7.5",
     "prettier": "^2.8.8",
     "react": "^18.2.0",

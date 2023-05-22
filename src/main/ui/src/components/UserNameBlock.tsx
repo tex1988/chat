@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC, KeyboardEvent, useContext, useState } from 'react';
 import { UserContext } from './Chat';
 
-const UserName: FC = () => {
+const UserNameBlock: FC = () => {
   const { userName, onNameSave } = useContext(UserContext);
   const [nameInput, setNameInput] = useState<string>('');
   const [isEditMode, setEditMode] = useState<boolean>(!userName);
@@ -67,4 +67,4 @@ const styles = {
   },
 };
 
-export default UserName;
+export default UserNameBlock;
