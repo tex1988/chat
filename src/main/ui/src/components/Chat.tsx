@@ -71,7 +71,7 @@ const Chat: FC = () => {
     if (validateName(userName)) {
       stompClient?.publish({
         destination: `/app/general`,
-        body: JSON.stringify({ name: userName, message: messageInput }),
+        body: JSON.stringify({ name: userName, content: messageInput }),
       });
       setMessageInput('');
     }
