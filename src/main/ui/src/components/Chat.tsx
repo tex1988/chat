@@ -1,53 +1,66 @@
-import { ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  createContext,
+  FC,
+  KeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import Message, { ChatMessage } from './Message';
 import { useStompClient, useSubscription } from 'react-stomp-hooks';
+import UserNameBlock from './UserNameBlock';
+
+export const UserContext = createContext<UserContextType>({
+  userName: null,
+  onNameSave: () => {},
+});
+
+type UserContextType = {
+  userName: string | null;
+  onNameSave: (name: string) => void;
+};
 
 const Chat: FC = () => {
-  // const defaultMessages: ChatMessage[] = [{ name: 'Tex', message: 'This is a long message...', time: '18:00' },
-  //   { name: 'Oleksii',
-  //       message: 'Another long message............................................................',
-  //       time: '18:00',
-  //     }
-  // ];
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const name = useRef<string>('');
-  const [displayName, setDisplayName] = useState<string>(name.current);
-  const [nameInput, setNameInput] = useState<string>('');
+  const [userName, setUserName] = useState<string | null>(getUserName);
+  const userContextValue: UserContextType = {
+    userName,
+    onNameSave: (name: string) => onNameSave(name),
+  };
   const [messageInput, setMessageInput] = useState<string>('');
+  const messageEnd = useRef<HTMLDivElement>(null);
   const stompClient = useStompClient();
-  useSubscription('/topic/general',
-    (message) => handleMessage(JSON.parse(message.body) as ChatMessage));
+  useSubscription('/topic/general', (message) =>
+    handleMessage(JSON.parse(message.body) as ChatMessage),
+  );
 
   useEffect(() => {
-  }, [messages, displayName]);
+    messageEnd.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, userName]);
 
   useEffect(() => {
-    name.current = getName();
+    setUserName(getUserName());
   }, []);
 
-  function getName(): string {
+  function getUserName(): string | null {
     const name: string | null = window.localStorage.getItem('name');
-    return !!name ? name : '';
+    return !!name ? name : null;
   }
 
-  function putNameToLS(name: string): void {
+  function saveUserNameToLS(name: string): void {
     if (name.length > 0) {
       window.localStorage.setItem('name', name);
     }
   }
 
   function handleMessage(message: ChatMessage) {
-    setMessages(messages => [...messages, message]);
+    setMessages((messages) => [...messages, message]);
   }
 
-  function onNameInput(event: ChangeEvent<HTMLInputElement>): void {
-    setNameInput(event.target.value);
-  }
-
-  function onSetNameButtonClick(): void {
-    name.current = nameInput;
-    setDisplayName(nameInput);
-    putNameToLS(nameInput);
+  function onNameSave(name: string): void {
+    setUserName(name);
+    saveUserNameToLS(name);
   }
 
   function onMessageInput(event: ChangeEvent<HTMLTextAreaElement>): void {
@@ -55,10 +68,10 @@ const Chat: FC = () => {
   }
 
   function onMessageSend(): void {
-    if (validateName()) {
+    if (validateName(userName)) {
       stompClient?.publish({
         destination: `/app/general`,
-        body: JSON.stringify({ name: name.current, message: messageInput }),
+        body: JSON.stringify({ name: userName, content: messageInput }),
       });
       setMessageInput('');
     }
@@ -70,14 +83,8 @@ const Chat: FC = () => {
     }
   }
 
-  function onNameInputKeyPress(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      onSetNameButtonClick();
-    }
-  }
-
-  function validateName(): boolean {
-    if (name.current.length < 3) {
+  function validateName(name: string | null | undefined): boolean {
+    if (name && name.length < 3) {
       alert('Please enter name not less than 3 characters');
       return false;
     }
@@ -86,26 +93,28 @@ const Chat: FC = () => {
 
   return (
     <>
-      <div className='flex-row-center'>
-        <input className='input' value={nameInput} placeholder='Enter your name' onChange={onNameInput}
-               onKeyDown={onNameInputKeyPress} />
-        <button onClick={onSetNameButtonClick} className='button'>Set name</button>
-      </div>
-      <div className='flex-row-center'>
-        <p>Your name: {name.current}</p>
-      </div>
-      <div className='message-area'>
-        {
-          messages.map((message, index) => <Message {...{ message: message, myName: name.current }} key={index} />)
-        }
-      </div>
-      <div className='text-area-container'>
-        <textarea className='text-area' value={messageInput} onChange={onMessageInput}
-                  onKeyDown={onTextAreaKeyPress}></textarea>
-      </div>
-      <div className='flex-row-center'>
-        <button className='button' onClick={onMessageSend}>Send message</button>
-      </div>
+      <UserContext.Provider value={userContextValue}>
+        <UserNameBlock />
+        <div className="message-area">
+          {messages.map((message, index) => (
+            <Message {...message} key={index} />
+          ))}
+          <div ref={messageEnd} />
+        </div>
+        <div className="message-editor">
+          <div className="text-area-container">
+            <textarea
+              className="text-area"
+              value={messageInput}
+              onChange={onMessageInput}
+              onKeyDown={onTextAreaKeyPress}
+            />
+          </div>
+          <button className="button" onClick={onMessageSend} disabled={messageInput.length < 1}>
+            Send message
+          </button>
+        </div>
+      </UserContext.Provider>
     </>
   );
 };
